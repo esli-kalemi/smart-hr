@@ -2,7 +2,7 @@ from fastapi import FastAPI
 
 from routes.auth import router as auth_router
 from routes.jobs import router as jobs_router
-
+from routes.applicants import router as applicants_router
 
 app = FastAPI(
     title="SmartHR",
@@ -13,6 +13,7 @@ app = FastAPI(
 
 app.include_router(auth_router)
 app.include_router(jobs_router)
+app.include_router(applicants_router)
 
 @app.get("/")
 def root():
