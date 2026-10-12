@@ -433,6 +433,13 @@ def extract_experience_requirements(text):
 
             for part in parts:
                 experience = part.strip(" ,.-")
+                
+                experience = re.sub(
+                    r"^(?:experience|background)\s+(?:in|with)\s+",
+                    "",
+                    experience,
+                    flags=re.IGNORECASE
+                )
 
                 experience = re.sub(
                     r"^(?:or|and)\s+",
@@ -454,3 +461,141 @@ def extract_experience_requirements(text):
                     requirements.append(experience)
 
     return requirements
+
+def extract_resume_skills(text):
+    text = text.lower()
+
+    known_skills = [
+        "javascript",
+        "typescript",
+        "python",
+        "java",
+        "c++",
+        "c#",
+        "sql",
+        "postgresql",
+        "mysql",
+        "mongodb",
+        "react",
+        "vue",
+        "angular",
+        "node.js",
+        "fastapi",
+        "django",
+        "flask",
+        "html",
+        "css",
+        "git",
+        "github",
+        "data analysis",
+        "data visualization",
+        "machine learning",
+        "project management",
+        "digital marketing",
+        "market research",
+        "seo",
+        "sales",
+        "customer service",
+        "financial analysis",
+        "excel",
+        "communication",
+        "teamwork",
+        "problem solving",
+        "leadership",
+        "critical thinking",
+        "adaptability",
+        "time management",
+        "attention to detail",
+    ]
+
+    found_skills = []
+
+    for skill in known_skills:
+        pattern = r"(?<!\w)" + re.escape(skill) + r"(?!\w)"
+
+        if re.search(pattern, text):
+            found_skills.append(skill)
+
+    return found_skills
+
+def extract_resume_experience_years(text):
+    text = text.lower()
+
+    number_words = {
+        "one": 1,
+        "two": 2,
+        "three": 3,
+        "four": 4,
+        "five": 5,
+        "six": 6,
+        "seven": 7,
+        "eight": 8,
+        "nine": 9,
+        "ten": 10,
+    }
+
+    number_pattern = (
+        r"(\d+(?:\.\d+)?|one|two|three|four|five|"
+        r"six|seven|eight|nine|ten)"
+    )
+
+    patterns = [
+        rf"\b{number_pattern}\+?\s+years?\s+(?:of\s+)?experience\b",
+        rf"\b{number_pattern}\+?\s+years?\s+"
+        rf"(?:of\s+)?[\w+#./-]+(?:\s+[\w+#./-]+){{0,5}}"
+        rf"\s+experience\b",
+    ]
+
+    for pattern in patterns:
+        match = re.search(pattern, text)
+
+        if match:
+            value = match.group(1)
+
+            if value in number_words:
+                return number_words[value]
+
+            return float(value) if "." in value else int(value)
+
+    return None
+
+def extract_resume_experience_years(text):
+    text = text.lower()
+
+    number_words = {
+        "one": 1,
+        "two": 2,
+        "three": 3,
+        "four": 4,
+        "five": 5,
+        "six": 6,
+        "seven": 7,
+        "eight": 8,
+        "nine": 9,
+        "ten": 10,
+    }
+
+    number_pattern = (
+        r"(\d+(?:\.\d+)?|one|two|three|four|five|"
+        r"six|seven|eight|nine|ten)"
+    )
+
+    patterns = [
+        rf"\b{number_pattern}\+?\s+years?\s+(?:of\s+)?experience\b",
+        rf"\b{number_pattern}\+?\s+years?\s+"
+        rf"(?:of\s+)?[\w+#./-]+(?:\s+[\w+#./-]+){{0,5}}"
+        rf"\s+experience\b",
+    ]
+
+    for pattern in patterns:
+        match = re.search(pattern, text)
+
+        if match:
+            value = match.group(1)
+
+            if value in number_words:
+                return number_words[value]
+
+            return float(value) if "." in value else int(value)
+
+    return None

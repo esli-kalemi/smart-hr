@@ -153,11 +153,12 @@ def match_experience(
     candidate_experience,
     required_experience
 ):
-    years_match = (
-        candidate_years >= required_years
-        if required_years is not None
-        else True
-    )
+    if required_years is None:
+        years_match = True
+    elif candidate_years is None:
+        years_match = None
+    else:
+        years_match = candidate_years >= required_years
 
     result = {
         "years": {

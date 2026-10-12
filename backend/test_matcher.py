@@ -1,100 +1,55 @@
-from services.ai.matcher import match_soft_skills
+
+from services.ai.application_analyzer import build_application_comparison
 
 
-tests = [
-    {
-        "name": "Exact soft skill",
-        "candidate": [
-            "communication",
-            "teamwork"
-        ],
-        "required": [
-            "communication"
-        ]
+sample_application = {
+    "candidates": {
+        "first_name": "John",
+        "last_name": "Smith",
+        "resume_text": """
+        John Smith is a software developer with experience in Python and SQL.      He has a Bachelor degree in Computer Science.
+        Skills include communication, teamwork and problem solving.
+        """
     },
-    {
-        "name": "Controlled equivalent",
-        "candidate": [
-            "collaboration"
-        ],
-        "required": [
-            "teamwork"
-        ]
-    },
-    {
-        "name": "Problem solving variation",
-        "candidate": [
-            "problem-solving"
-        ],
-        "required": [
-            "problem solving"
-        ]
-    },
-    {
-        "name": "Semantic match",
-        "candidate": [
-            "verbal communication"
-        ],
-        "required": [
-            "communication"
-        ]
-    },
-    {
-        "name": "Related but not strong enough",
-        "candidate": [
-            "teamwork"
-        ],
-        "required": [
-            "leadership"
-        ]
-    },
-    {
-        "name": "Missing soft skill",
-        "candidate": [
-            "communication"
-        ],
-        "required": [
-            "leadership"
-        ]
-    },
-    {
-        "name": "Multiple requirements",
-        "candidate": [
-            "communication",
-            "collaboration",
-            "critical thinking"
-        ],
-        "required": [
-            "communication",
-            "teamwork",
-            "problem solving"
-        ]
-    },
-    {
-        "name": "No candidate soft skills",
-        "candidate": [],
-        "required": [
-            "communication"
-        ]
-    },
-    {
-        "name": "No required soft skills",
-        "candidate": [
-            "communication"
-        ],
-        "required": []
+    "jobs": {
+        "title": "Junior Full-Stack Developer",
+        "description": """
+        We are looking for a Junior Full-Stack Developer with one year
+        of relevant experience.Experience in web development is required.Communication, teamwork and problem
+        solving are important for this role.
+        """
+        ,
+        "requirements": {
+            "skills": [
+                "JavaScript",
+                "React",
+                "Python",
+                "SQL",
+                "PostgreSQL"
+            ],
+            "education": "Bachelor degree in Computer Science or related field",
+            "soft_skills": [
+                "Communication",
+                "Teamwork",
+                "Problem solving"
+            ],
+            "experience_years": 1
+        }
     }
-]
+}
 
 
-for test in tests:
-    print("\n" + "=" * 60)
-    print(test["name"])
-    print("=" * 60)
+if __name__ == "__main__":
+    result = build_application_comparison(sample_application)
 
-    result = match_soft_skills(
-        test["candidate"],
-        test["required"]
-    )
+    print("\n=== OVERALL SCORE ===")
+    print(result["scoring"]["overall_score"])
 
-    print(result)
+    print("\n=== CATEGORY SCORES ===")
+    print(result["scoring"]["category_scores"])
+
+    print("\n=== COMPARISON ===")
+    print(result["comparison"])
+
+    print("\n=== CANDIDATE EVIDENCE ===")
+    print(result["candidate_evidence"])
