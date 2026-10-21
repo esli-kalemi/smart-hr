@@ -1,0 +1,134 @@
+.create-job-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  overflow-y: auto;
+  background: rgba(15, 23, 42, 0.55);
+}
+
+.create-job-modal {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 560px;
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+  padding: 28px;
+  border: 1px solid var(--border-color, #e5e7eb);
+  border-radius: 18px;
+  background: var(--card-background, #ffffff);
+  color: var(--text-color, #111827);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.2);
+}
+
+.create-job-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.create-job-header h2 {
+  margin: 8px 0;
+}
+
+.create-job-header p {
+  margin: 0;
+  color: var(--muted-color, #6b7280);
+  font-size: 14px;
+}
+
+.create-job-close {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  border: 1px solid var(--border-color, #e5e7eb);
+  border-radius: 10px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.create-job-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 18px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.create-job-field input,
+.create-job-field textarea {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--border-color, #d1d5db);
+  border-radius: 10px;
+  background: var(--input-background, #ffffff);
+  color: inherit;
+  font: inherit;
+  font-weight: 400;
+}
+
+.create-job-field textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.create-job-field input:focus,
+.create-job-field textarea:focus {
+  outline: 2px solid #8b5cf6;
+  outline-offset: 1px;
+}
+
+.create-job-hint {
+  color: var(--muted-color, #6b7280);
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.create-job-error {
+  color: #dc2626;
+  font-size: 14px;
+}
+
+.create-job-actions {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 26px;
+}
+
+.create-job-cancel {
+  padding: 11px 16px;
+  border: 1px solid var(--border-color, #d1d5db);
+  border-radius: 10px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.create-job-actions button:disabled,
+.create-job-close:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@media (max-width: 520px) {
+  .create-job-modal {
+    padding: 20px;
+  }
+
+  .create-job-actions button {
+    flex: 1;
+    justify-content: center;
+  }
+}

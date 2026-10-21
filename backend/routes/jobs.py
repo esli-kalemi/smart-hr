@@ -4,9 +4,11 @@ from schemas.jobs import JobCreateRequest, JobUpdateRequest
 from services.jobs_service import (
     create_job,
     get_company_jobs,
+    get_deleted_company_jobs,
     get_job,
     update_job,
-    delete_job
+    delete_job,
+    restore_job
 )
 from utils.auth import get_current_user
 from utils.supabase_client import supabase_admin
@@ -64,7 +66,47 @@ def get_jobs(
             detail="Failed to retrieve jobs"
         )
 
+@router.get("/trash")
+def get_deleted_jobs_route(
+    current_user=Depends(get_current_user)
+):
+    try:
+        jobs = get_deleted_company_jobs(
+            supabase_admin,
+            current_user["company_id"]
+        )
 
+        return {"jobs": jobs}
+
+    except Exception:
+        raise HTTPException(
+            status_code=500,
+            detail="Failed to retrieve deleted jobs"
+        )
+
+@router.post("/{job_id}/restore")
+def restore_job_route(
+    job_id: str,
+    current_user=Depends(get_current_user)
+):
+    try:
+        job = restore_job(
+            supabase_admin,
+            current_user["company_id"],
+            job_id
+        )
+
+        return {
+            "message": "Job restored successfully",
+            "job": job
+        }
+
+    except Exception:
+        raise HTTPException(
+            status_code=404,
+            detail="Job not found in Trash or restoration failed"
+        )
+    
 @router.get("/{job_id}")
 def get_single_job(
     job_id: str,

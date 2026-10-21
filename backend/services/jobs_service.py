@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from supabase import Client
 
 
@@ -36,6 +37,7 @@ def get_company_jobs(
         .table("jobs")
         .select("*")
         .eq("company_id", company_id)
+        .is_("deleted_at", "null")
         .order("created_at", desc=True)
         .execute()
     )
@@ -54,7 +56,8 @@ def get_job(
         .select("*")
         .eq("id", job_id)
         .eq("company_id", company_id)
-        .single()
+        .is_("deleted_at", "null")
+        .maybe_single()
         .execute()
     )
 
@@ -73,6 +76,7 @@ def update_job(
         .update(updates)
         .eq("id", job_id)
         .eq("company_id", company_id)
+        .is_("deleted_at", "null")
         .execute()
     )
 
@@ -90,13 +94,52 @@ def delete_job(
     response = (
         supabase_admin
         .table("jobs")
-        .delete()
+        .update({
+            "deleted_at": datetime.now(timezone.utc).isoformat()
+        })
         .eq("id", job_id)
         .eq("company_id", company_id)
+        .is_("deleted_at", "null")
         .execute()
     )
 
     if not response.data:
         raise Exception("Job deletion failed")
+
+    return response.data[0]
+
+def get_deleted_company_jobs(
+    supabase_admin: Client,
+    company_id: str
+):
+    response = (
+        supabase_admin
+        .table("jobs")
+        .select("*")
+        .eq("company_id", company_id)
+        .not_.is_("deleted_at", "null")
+        .order("deleted_at", desc=True)
+        .execute()
+    )
+
+    return response.data
+
+def restore_job(
+    supabase_admin: Client,
+    company_id: str,
+    job_id: str
+):
+    response = (
+        supabase_admin
+        .table("jobs")
+        .update({"deleted_at": None})
+        .eq("id", job_id)
+        .eq("company_id", company_id)
+        .not_.is_("deleted_at", "null")
+        .execute()
+    )
+
+    if not response.data:
+        raise Exception("Job restoration failed")
 
     return response.data[0]
