@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { BriefcaseBusiness, Eye, EyeOff, LockKeyhole, Mail, Sparkles } from "lucide-react";
-import "./Login.css";
+import "./style/Login.css";
 
 export default function Login({ onLogin, loading, error }) {
   const [email, setEmail] = useState("");

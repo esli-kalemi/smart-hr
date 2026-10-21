@@ -1,5 +1,5 @@
 import { X, Save, BriefcaseBusiness } from "lucide-react";
-import "./JobDetailsModal.css";
+import "./style/JobDetailsModal.css";
 import { useState } from "react";
 export default function JobDetailsModal({
   job,

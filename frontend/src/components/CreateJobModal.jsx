@@ -1,5 +1,5 @@
 import { X, Plus } from "lucide-react";
-import "./CreateJobModal.css";
+import "./style/CreateJobModal.css";
 
 export default function CreateJobModal({
   onClose,

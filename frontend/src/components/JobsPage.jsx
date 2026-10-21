@@ -1,5 +1,5 @@
 import { BriefcaseBusiness, Plus, CalendarDays } from "lucide-react";
-import "./JobsPage.css";
+import "./style/JobsPage.css";
 
 export default function JobsPage({
   jobs,
