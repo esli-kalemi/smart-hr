@@ -15,6 +15,7 @@ import {
   CheckCircle2,
   Sparkles,
   LogOut,
+  Trash2,
 } from "lucide-react";
 import {
   loginUser,
@@ -23,14 +24,18 @@ import {
   apiRequest,
   analyzeApplication,
   deleteJob,
+  getDeletedJobs,
+  restoreJob,
 } from "./api/client";
 import Login from "./components/Login";
 import "./App.css";
 import AIAnalysis from "./pages/AIAnalysis";
 import CreateJobModal from "./components/CreateJobModal";
 import { createJob, updateJob } from "./api/client";
-import JobsPage from "./components/JobsPage";
+import JobsPage from "./pages/JobsPage";
 import JobDetailsModal from "./components/JobDetailsModal";
+import TrashPage from "./pages/TrashPage";
+import CandidatesPage from "./pages/CandidatesPage";
 
 const navigation = [
   { label: "Dashboard", icon: LayoutDashboard, active: true },
@@ -39,6 +44,7 @@ const navigation = [
   { label: "Candidates", icon: Users },
   { label: "Applications", icon: FileText },
   { label: "Interviews", icon: CalendarDays },
+  { label: "Trash", icon: Trash2 },
 ];
 
 const mockApplications = [
@@ -67,7 +73,11 @@ function App() {
   const [savingJobChanges, setSavingJobChanges] = useState(false);
   const [jobDetailsError, setJobDetailsError] = useState(""); 
   const [deletingJob, setDeletingJob] = useState(false);
-
+  const [deletedJobs, setDeletedJobs] = useState([]);
+  const [loadingDeletedJobs, setLoadingDeletedJobs] = useState(false);
+  const [trashError, setTrashError] = useState("");
+  const [restoringJobId, setRestoringJobId] = useState(null);
+  
   useEffect(() => {
     let cancelled = false;
 
@@ -112,6 +122,28 @@ function App() {
     fetchJobs();
   }, [user]);
   
+  useEffect(() => {
+    if (!user || activePage !== "Trash") {
+      return;
+    }
+
+    const fetchDeletedJobs = async () => {
+      setLoadingDeletedJobs(true);
+      setTrashError("");
+
+      try {
+        const data = await getDeletedJobs();
+        setDeletedJobs(data.jobs || []);
+      } catch (error) {
+        setTrashError(error.message || "Failed to load deleted jobs.");
+      } finally {
+        setLoadingDeletedJobs(false);
+      }
+    };
+
+    fetchDeletedJobs();
+  }, [user, activePage]);
+
   useEffect(() => {
     if (!user) return;
 
@@ -212,6 +244,27 @@ function App() {
       setDeletingJob(false);
     }
   }
+  
+  const handleRestoreJob = async (job) => {
+    setRestoringJobId(job.id);
+    setTrashError("");
+
+    try {
+      await restoreJob(job.id);
+
+      // Refresh the active jobs list.
+      const activeJobsData = await apiRequest("/jobs/");
+      setJobs(activeJobsData.jobs || []);
+
+      // Refresh the Trash list.
+      const deletedJobsData = await getDeletedJobs();
+      setDeletedJobs(deletedJobsData.jobs || []);
+    } catch (error) {
+      setTrashError(error.message || "Failed to restore the job.");
+    } finally {
+      setRestoringJobId(null);
+    }
+  };
 
 
   async function handleAnalyzeApplication(applicationId) {
@@ -273,7 +326,19 @@ function App() {
       setAnalyzingId(null);
     }
   }
+  function handleViewAnalysis(application) {
+    setAnalysisError("");
+    setAnalysisSuccess("");
+    setSelectedAnalysis(application);
 
+    // Only generate a new analysis if no saved result exists.
+    if (application.ai_analysis && application.ai_score != null) {
+      return;
+    }
+
+    // Otherwise, run the analysis for this application.
+    handleAnalyzeApplication(application.id);
+  }
 
   function handleLogout() {
     logoutUser();
@@ -686,6 +751,15 @@ function App() {
               setJobDetailsError("");
             }}    
           />
+        ) : activePage === "Candidates" ? (
+          <CandidatesPage
+            realApplications={realApplications}
+            analyzingId={analyzingId}
+            onAnalyzeApplication={handleAnalyzeApplication}
+            onViewAnalysis={handleViewAnalysis}
+            selectedAnalysis={selectedAnalysis}
+            analysisError={analysisError}
+          />
         ) : activePage === "AI Analysis" ? (
           <AIAnalysis
             realApplications={realApplications}
@@ -695,6 +769,14 @@ function App() {
             selectedAnalysis={selectedAnalysis}
             handleAnalyzeApplication={handleAnalyzeApplication}
             setSelectedAnalysis={setSelectedAnalysis}
+          />
+         ) : activePage === "Trash" ? (
+          <TrashPage
+            jobs={deletedJobs}
+            loading={loadingDeletedJobs}
+            error={trashError}
+            restoringJobId={restoringJobId}
+            onRestore={handleRestoreJob}
           />
         ) : (
         <div className="dashboard">

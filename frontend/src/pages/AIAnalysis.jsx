@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { ChevronDown, Sparkles, CheckCircle2, AlertTriangle, Lightbulb, X, } from "lucide-react";
-import "./AIAnalysis.css";
+import "./style/AIAnalysis.css";
 
 export default function AIAnalysis({
   realApplications,

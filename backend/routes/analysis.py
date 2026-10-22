@@ -33,7 +33,11 @@ def analyze_application(
             company_id,
             application_id,
         )
-    except Exception:
+    except Exception as exc:
+        print(
+            f"Application lookup failed: "
+            f"id={application_id}, error={exc!r}"
+        )
         raise HTTPException(
             status_code=404,
             detail="Application not found",
