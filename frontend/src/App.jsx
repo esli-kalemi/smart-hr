@@ -36,6 +36,7 @@ import JobsPage from "./pages/JobsPage";
 import JobDetailsModal from "./components/JobDetailsModal";
 import TrashPage from "./pages/TrashPage";
 import CandidatesPage from "./pages/CandidatesPage";
+import ApplicationsPage from "./pages/ApplicationsPage";
 
 const navigation = [
   { label: "Dashboard", icon: LayoutDashboard, active: true },
@@ -77,7 +78,7 @@ function App() {
   const [loadingDeletedJobs, setLoadingDeletedJobs] = useState(false);
   const [trashError, setTrashError] = useState("");
   const [restoringJobId, setRestoringJobId] = useState(null);
-  
+
   useEffect(() => {
     let cancelled = false;
 
@@ -223,6 +224,13 @@ function App() {
   }
   
   
+  function handleCloseApplicationAnalysis() {
+    setSelectedAnalysis(null);
+    setAnalysisError("");
+    setAnalysisSuccess("");
+  }
+
+  
   async function handleDeleteJob() {
     if (!selectedJob) return;
 
@@ -326,6 +334,36 @@ function App() {
       setAnalyzingId(null);
     }
   }
+  
+  
+  async function handleUpdateApplication(applicationId, updates) {
+    try {
+      const result = await apiRequest(
+        `/applicants/applications/${applicationId}`,
+        {
+          method: "PUT",
+          body: JSON.stringify(updates),
+        }
+      );
+
+      const updatedApplication = result.application;
+
+      setRealApplications((previousApplications) =>
+        previousApplications.map((application) =>
+          application.id === applicationId
+            ? { ...application, ...updatedApplication }
+            : application
+        )
+      );
+
+      return updatedApplication;
+    } catch (error) {
+      console.error("Failed to update application:", error);
+      throw error;
+    }
+  }
+
+
   function handleViewAnalysis(application) {
     setAnalysisError("");
     setAnalysisSuccess("");
@@ -759,6 +797,17 @@ function App() {
             onViewAnalysis={handleViewAnalysis}
             selectedAnalysis={selectedAnalysis}
             analysisError={analysisError}
+          />
+        ) : activePage === "Applications" ? (
+          <ApplicationsPage
+            realApplications={realApplications}
+            onViewAnalysis={handleViewAnalysis}
+            onUpdateApplication={handleUpdateApplication}
+            analyzingId={analyzingId}
+            selectedAnalysis={selectedAnalysis}
+            analysisError={analysisError}
+            onAnalyzeApplication={handleAnalyzeApplication}
+            onCloseAnalysis={handleCloseApplicationAnalysis}
           />
         ) : activePage === "AI Analysis" ? (
           <AIAnalysis

@@ -6,6 +6,7 @@ from routes.auth import router as auth_router
 from routes.jobs import router as jobs_router
 from routes.applicants import router as applicants_router
 from routes.analysis import router as analysis_router
+from routes.interviews import router as interviews_router
 
 app = FastAPI(
     title="SmartHR",
@@ -29,6 +30,7 @@ app.include_router(auth_router)
 app.include_router(jobs_router)
 app.include_router(applicants_router)
 app.include_router(analysis_router)
+app.include_router(interviews_router)
 
 @app.get("/")
 def root():
