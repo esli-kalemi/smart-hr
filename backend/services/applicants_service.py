@@ -80,6 +80,84 @@ def create_application(
 
     return response.data[0]
 
+def add_resume_signed_url(
+    supabase_admin: Client,
+    application: dict
+):
+    candidate = application.get("candidates")
+
+    if not candidate or not candidate.get("resume_url"):
+        return application
+
+    try:
+        signed_url_response = (
+            supabase_admin
+            .storage
+            .from_("candidate-resumes")
+            .create_signed_url(
+                candidate["resume_url"],
+                300
+            )
+        )
+
+        candidate["resume_url"] = (
+            signed_url_response.get("signedURL")
+            or signed_url_response.get("signedUrl")
+        )
+
+    except Exception as exc:
+        print(f"Failed to generate resume URL: {exc}")
+        candidate["resume_url"] = None
+
+    return application
+
+
+def get_application_resume_path(
+    supabase_admin: Client,
+    company_id: str,
+    application_id: str,
+):
+    application_response = (
+        supabase_admin
+        .table("applications")
+        .select("id, job_id, candidate_id")
+        .eq("id", application_id)
+        .single()
+        .execute()
+    )
+
+    if not application_response.data:
+        raise Exception("Application not found")
+
+    application = application_response.data
+
+    job_response = (
+        supabase_admin
+        .table("jobs")
+        .select("id")
+        .eq("id", application["job_id"])
+        .eq("company_id", company_id)
+        .single()
+        .execute()
+    )
+
+    if not job_response.data:
+        raise Exception("Application not found")
+
+    candidate_response = (
+        supabase_admin
+        .table("candidates")
+        .select("resume_url")
+        .eq("id", application["candidate_id"])
+        .single()
+        .execute()
+    )
+
+    if not candidate_response.data:
+        raise Exception("Candidate not found")
+
+    return candidate_response.data.get("resume_url")
+
 
 def get_company_applications(
     supabase_admin: Client,
@@ -109,7 +187,10 @@ def get_company_applications(
         .execute()
     )
 
-    return response.data
+    return [
+        add_resume_signed_url(supabase_admin, application)
+        for application in response.data
+    ]
 
 
 def get_application(
@@ -158,8 +239,10 @@ def get_application(
     if not detailed_response.data:
         raise Exception("Application not found")
 
-    return detailed_response.data
-
+    return add_resume_signed_url(
+        supabase_admin,
+        detailed_response.data
+    )
 
 def update_application(
     supabase_admin: Client,

@@ -74,7 +74,8 @@ def analyze_application(
         )
         explanation = explanation.model_dump()
         explanation_status = "generated"
-    except Exception:
+    except Exception as exc:
+        print(f"AI explanation generation failed:{exc!r}")
         explanation = {
             "summary": (
                 "The match score was calculated, but the AI explanation "

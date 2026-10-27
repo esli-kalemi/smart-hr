@@ -1392,3 +1392,124 @@ tbody tr:hover {
     padding: 17px 14px;
   }
 }
+
+
+.notifications-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.notification-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 20px;
+  background: var(--card-bg, #ffffff);
+  border: 1px solid var(--border-color, #e5e7eb);
+  border-radius: 12px;
+  text-align: left;
+  transition: background 0.2s ease;
+}
+
+.notification-item:hover {
+  background: var(--hover-bg, #f8fafc);
+}
+
+.notification-item > svg {
+  flex-shrink: 0;
+  color: #64748b;
+}
+
+.notification-item > div {
+  flex: 1;
+  min-width: 0;
+}
+
+.notification-item p {
+  margin: 0 0 5px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary, #1f2937);
+}
+
+.notification-item span {
+  display: block;
+  font-size: 13px;
+  color: var(--text-secondary, #64748b);
+}
+
+.notification-item button {
+  padding: 8px 14px;
+  border: 1px solid var(--border-color, #d1d5db);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-primary, #374151);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.notification-item button:hover {
+  background: #f1f5f9;
+}
+
+.notification-item.unread {
+  background: #f8faff;
+  border-color: #c7d2fe;
+}
+
+.notification-item.unread > svg {
+  color: #4f46e5;
+}
+
+/* Notification badge on the bell */
+.notification-bell {
+  position: relative;
+}
+
+.notification-count {
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #ef4444;
+  color: #ffffff;
+  border: 2px solid #ffffff;
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1;
+  box-sizing: border-box;
+}
+
+/* Notification badge on the bell */
+.notification-bell {
+  position: relative;
+}
+
+.notification-count {
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #ef4444;
+  color: #ffffff;
+  border: 2px solid #ffffff;
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1;
+  box-sizing: border-box;
+}

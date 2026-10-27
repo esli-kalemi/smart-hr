@@ -143,3 +143,15 @@ def restore_job(
         raise Exception("Job restoration failed")
 
     return response.data[0]
+
+
+def get_public_jobs(supabase_admin: Client):
+    response = (
+        supabase_admin.table("jobs")
+        .select("*")
+        .eq("status", "active")
+        .is_("deleted_at", "null")
+        .order("created_at", desc=True)
+        .execute()
+    )
+    return response.data

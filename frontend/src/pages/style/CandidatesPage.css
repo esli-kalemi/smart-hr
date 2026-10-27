@@ -374,3 +374,117 @@
     text-align: left;
   }
 }
+
+/* Resume viewer overlay */
+.resume-viewer-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(15, 23, 42, 0.72);
+  backdrop-filter: blur(4px);
+}
+
+/* Main resume viewer modal */
+.resume-viewer-modal {
+  position: relative;
+  z-index: 2001;
+  display: flex;
+  flex-direction: column;
+  width: min(1000px, 100%);
+  height: min(88vh, 850px);
+  overflow: hidden;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  box-shadow: 0 24px 70px rgba(15, 23, 42, 0.3);
+}
+
+/* Modal header */
+.resume-viewer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 24px;
+  background: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.resume-viewer-header h3 {
+  margin: 0;
+  color: #1e293b;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+}
+
+.resume-viewer-header button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  color: #64748b;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 9px;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+  transition: color 0.2s ease, background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.resume-viewer-header button:hover {
+  color: #dc2626;
+  background: #fef2f2;
+  border-color: #fecaca;
+}
+
+/* Document viewing area */
+.resume-viewer-content {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 24px;
+  background: #e5e7eb;
+}
+
+/* DOCX document pages */
+.resume-viewer-content .docx-wrapper {
+  padding: 8px 0;
+  background: transparent;
+}
+
+.resume-viewer-content .docx-wrapper > section {
+  margin: 0 auto 24px;
+  box-shadow: 0 3px 12px rgba(15, 23, 42, 0.12);
+}
+
+/* Smaller screens */
+@media (max-width: 640px) {
+  .resume-viewer-overlay {
+    padding: 10px;
+  }
+
+  .resume-viewer-modal {
+    width: 100%;
+    height: 94vh;
+    border-radius: 12px;
+  }
+
+  .resume-viewer-header {
+    padding: 14px 16px;
+  }
+
+  .resume-viewer-content {
+    padding: 16px 8px;
+  }
+}
+

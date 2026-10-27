@@ -4,6 +4,7 @@ from schemas.jobs import JobCreateRequest, JobUpdateRequest
 from services.jobs_service import (
     create_job,
     get_company_jobs,
+    get_public_jobs,
     get_deleted_company_jobs,
     get_job,
     update_job,
@@ -19,6 +20,15 @@ router = APIRouter(
     tags=["Jobs"]
 )
 
+
+@router.get("/public")
+def get_public_jobs_route():
+    try:
+        jobs = get_public_jobs(supabase_admin)
+        return {"jobs": jobs}
+    except Exception:
+        raise HTTPException(status_code=500, detail="Failed to retrieve public jobs")
+    
 
 @router.post("/")
 def create_job_route(

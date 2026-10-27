@@ -7,7 +7,6 @@ import {
   FileText,
   CalendarDays,
   Settings,
-  Search,
   Bell,
   ChevronDown,
   Sparkles,
@@ -71,7 +70,13 @@ function App() {
   const [trashError, setTrashError] = useState("");
   const [restoringJobId, setRestoringJobId] = useState(null);
   const [interviews, setInterviews] = useState([]);
-
+  const [notificationsViewedAt, setNotificationsViewedAt] =
+    useState(() => {
+      return (
+        localStorage.getItem("notificationsViewedAt") ||
+        new Date().toISOString()
+      );
+    });
   useEffect(() => {
     let cancelled = false;
 
@@ -144,6 +149,8 @@ function App() {
     async function fetchApplications() {
       try {
         const data = await apiRequest("/applicants/applications");
+        setRealApplications(data.applications || []);
+        console.log("Applications data:", data.applications);
         setRealApplications(data.applications || []);
       } catch (error) {
         console.error("Failed to fetch applications:", error);
@@ -409,7 +416,12 @@ function App() {
       />
     );
   }
-
+  const unreadNotificationsCount = realApplications.filter(
+    (application) =>
+      application.applied_at &&
+      new Date(application.applied_at).getTime() >
+        new Date(notificationsViewedAt).getTime()
+  ).length;
   return (
     <div className="app-shell">
       <aside className="sidebar">
@@ -490,14 +502,27 @@ function App() {
             Workspace <span>/</span> <strong>{activePage}</strong>
           </div>
           <div className="topbar-actions">
-            <label className="search-box">
-              <Search size={18} />
-              <input placeholder="Search anything..." aria-label="Search" />
-              <kbd>⌘ K</kbd>
-            </label>
-            <button className="icon-button" aria-label="Notifications">
+            <button
+              className="icon-button notification-bell"
+              aria-label={`Notifications, ${unreadNotificationsCount} unread`}
+              title="Notifications"
+              onClick={() => {
+                const now = new Date().toISOString();
+
+                localStorage.setItem("notificationsViewedAt", now);
+                setNotificationsViewedAt(now);
+                setActivePage("Notifications");
+              }}
+            >
               <Bell size={19} />
-              <span className="notification-dot" />
+
+              {unreadNotificationsCount > 0 && (
+                <span className="notification-count">
+                  {unreadNotificationsCount > 99
+                    ? "99+"
+                    : unreadNotificationsCount}
+                </span>
+              )}
             </button>
             <div className="topbar-divider" />
             <div className="today-label">
@@ -571,17 +596,73 @@ function App() {
             apiRequest={apiRequest}
             realApplications={realApplications}
           />
-        ) : (
-        <div className="dashboard">
-          <section className="welcome-row">
-            <div>
-              <div className="eyebrow">WORKSPACE</div>
-              <h1>{activePage}</h1>
-              <p>This section is not available yet.</p>
-            </div>
-          </section>
-        </div>
-      )}
+          ) : activePage === "Notifications" ? (
+          <div className="dashboard">
+            <section className="welcome-row">
+              <div>
+                <h1>Notifications</h1>
+                <p>Stay updated on new candidate applications.</p>
+              </div>
+            </section>
+
+            <section className="dashboard-section">
+              <div className="empty-state">
+                {realApplications.length === 0 ? (
+                  <>
+                    <Bell size={22} />
+                    <p>No new notifications</p>
+                  </>
+                ) : (
+                  <div className="notifications-list">
+                    {realApplications.map((application) => (
+                      <div
+                        key={application.id}
+                        className="notification-item"
+                      >
+                        <Bell size={18} />
+
+                        <div>
+                          <p>
+                            New application received
+                          </p>
+                          <span>
+                            {application.candidates?.full_name ||
+                             application.candidates?.name ||
+                             application.candidates?.email ||
+                              "New candidate"}
+                          </span>
+                          <span>
+                            Applied{" "}
+                            {application.applied_at
+                              ? new Date(application.applied_at).toLocaleDateString()
+                              : "recently"}
+                          </span>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => setActivePage("AI Analysis")}
+                        >
+                          View
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </section>
+          </div>
+          ) : (
+          <div className="dashboard">
+            <section className="welcome-row">
+              <div>
+                <div className="eyebrow">WORKSPACE</div>
+                <h1>{activePage}</h1>
+                <p>This section is not available yet.</p>
+              </div>
+            </section>
+          </div>
+        )}
       </main>
       {showJobForm && (
         <CreateJobModal
