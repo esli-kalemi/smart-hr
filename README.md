@@ -43,4 +43,4 @@ SmartHR is an AI-powered recruitment management platform designed to simplify th
 
 The goal of SmartHR is to reduce manual recruitment effort, improve applicant organization, and provide HR professionals with AI-assisted insights to support more informed hiring decisions.
 
-Human in the loop approach: AI-generated scores are estimates based on extracted resume information and support, not replace, human hiring decisions.*
+Human in the loop approach: AI-generated scores are estimated based on extracted resume information and they support, not replace, human hiring decisions.
