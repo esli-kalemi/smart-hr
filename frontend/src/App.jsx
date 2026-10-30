@@ -35,6 +35,7 @@ import CandidatesPage from "./pages/CandidatesPage";
 import ApplicationsPage from "./pages/ApplicationsPage";
 import InterviewsPage from "./pages/InterviewsPage"
 import Dashboard from "./pages/Dashboard";
+import SettingsPage from "./pages/SettingsPage";
 
 const navigation = [
   { label: "Dashboard", icon: LayoutDashboard, active: true },
@@ -49,7 +50,7 @@ const navigation = [
 function App() {
   const [user, setUser] = useState(null);
   const [checkingSession, setCheckingSession] = useState(true);
-  const [activePage, setActivePage] = useState("Dashboard");
+  const [activePage, setActivePage] = useState( () => localStorage.getItem("smarthr_active_page") || "Dashboard");
   const [loginLoading, setLoginLoading] = useState(false);
   const [loginError, setLoginError] = useState("");
   const [jobs, setJobs] = useState([]);
@@ -77,6 +78,9 @@ function App() {
         new Date().toISOString()
       );
     });
+  useEffect(() => {
+    localStorage.setItem("smarthr_active_page", activePage);
+  }, [activePage]);
   useEffect(() => {
     let cancelled = false;
 
@@ -467,10 +471,18 @@ function App() {
         </nav>
 
         <div className="sidebar-bottom">
-          <a href="#settings" className="nav-link">
+           <a
+              href="#settings"
+              className={`nav-link ${activePage === "Settings" ? "active" : ""}`}
+              onClick={(event) => {
+                event.preventDefault();
+                setActivePage("Settings");
+              }}
+            >
             <Settings size={19} strokeWidth={1.8} />
             <span>Settings</span>
           </a>
+            
           <div className="sidebar-help">
             <div className="help-icon"><Sparkles size={18} /></div>
             <strong>AI-powered hiring</strong>
@@ -597,6 +609,8 @@ function App() {
             apiRequest={apiRequest}
             realApplications={realApplications}
           />
+          ) : activePage === "Settings" ? (
+            <SettingsPage user={user} />
           ) : activePage === "Notifications" ? (
           <div className="dashboard">
             <section className="welcome-row">

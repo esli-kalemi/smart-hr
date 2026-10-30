@@ -1,0 +1,228 @@
+.settings-page {
+  padding: 32px;
+  width: 100%;
+}
+
+.settings-header {
+  margin-bottom: 32px;
+}
+
+.settings-header h1 {
+  font-size: 26px;
+  font-weight: 700;
+  color: #24212f;
+  margin-bottom: 8px;
+}
+
+.settings-header p {
+  font-size: 14px;
+  color: #85818f;
+}
+
+.settings-section {
+  max-width: 850px;
+}
+
+.settings-section h2 {
+  font-size: 17px;
+  font-weight: 600;
+  color: #302c3d;
+  margin-bottom: 18px;
+}
+
+.settings-profile-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 28px;
+  padding: 28px;
+  background: #ffffff;
+  border: 1px solid #eeeaf5;
+  border-radius: 14px;
+  box-shadow: 0 3px 12px rgba(35, 25, 60, 0.04);
+}
+
+.settings-avatar {
+  width: 68px;
+  height: 68px;
+  min-width: 68px;
+  border-radius: 50%;
+  background: #eee9fc;
+  color: #7652d6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.settings-profile-details {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+}
+
+.settings-field label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: #898494;
+  margin-bottom: 8px;
+}
+
+.settings-field p {
+  font-size: 14px;
+  font-weight: 500;
+  color: #302c3d;
+  margin: 0;
+}
+
+
+@media (max-width: 650px) {
+  .settings-page {
+    padding: 20px;
+  }
+
+  .settings-profile-card {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .settings-profile-details {
+    grid-template-columns: 1fr;
+  }
+}
+/* COMPANY STYLE */
+/* Section heading */
+.settings-section-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+  gap: 16px;
+}
+
+.settings-section-heading h2 {
+  margin-bottom: 6px;
+}
+
+.settings-section-heading p {
+  font-size: 13px;
+  color: #898494;
+  margin: 0;
+}
+
+/* Company card */
+.settings-company-card {
+  padding: 28px;
+  background: #ffffff;
+  border: 1px solid #eeeaf5;
+  border-radius: 14px;
+  box-shadow: 0 3px 12px rgba(35, 25, 60, 0.04);
+}
+
+.settings-company-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+}
+
+.settings-company-grid .settings-field input,
+.settings-company-grid .settings-field textarea {
+  width: 100%;
+  padding: 11px 13px;
+  border: 1px solid #e7e3ef;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #302c3d;
+  font-family: inherit;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.settings-company-grid .settings-field input:focus,
+.settings-company-grid .settings-field textarea:focus {
+  border-color: #7652d6;
+  box-shadow: 0 0 0 3px rgba(118, 82, 214, 0.10);
+}
+
+.settings-company-grid .settings-field textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.settings-company-description {
+  grid-column: 1 / -1;
+}
+
+.settings-company-grid .settings-field p {
+  overflow-wrap: anywhere;
+  line-height: 1.6;
+}
+
+/* Buttons */
+.settings-edit-button,
+.settings-save-button,
+.settings-cancel-button {
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 160ms ease;
+}
+
+.settings-edit-button,
+.settings-save-button {
+  background: #7652d6;
+  color: #ffffff;
+  border: 1px solid #7652d6;
+}
+
+.settings-edit-button:hover,
+.settings-save-button:hover {
+  background: #6240bd;
+  border-color: #6240bd;
+}
+
+.settings-cancel-button {
+  background: #ffffff;
+  color: #77798e;
+  border: 1px solid #e7e3ef;
+}
+
+.settings-cancel-button:hover {
+  background: #f7f5ff;
+  color: #6251e7;
+}
+
+.settings-company-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 26px;
+  padding-top: 20px;
+  border-top: 1px solid #f0edf5;
+}
+
+/* Responsive */
+@media (max-width: 650px) {
+  .settings-section-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .settings-company-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .settings-company-description {
+    grid-column: auto;
+  }
+
+  .settings-company-card {
+    padding: 20px;
+  }
+}
