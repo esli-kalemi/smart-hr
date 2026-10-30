@@ -65,7 +65,7 @@ def semantic_skill_match(resume_skills, job_skills):
 
     for job_skill in job_skills:
         normalized_job_skill = job_skill.lower().strip()
-
+        
         # Exact match
         if normalized_job_skill in resume_skill_set:
             matches.append({

@@ -30,6 +30,7 @@ def get_public_jobs_route():
         raise HTTPException(status_code=500, detail="Failed to retrieve public jobs")
     
 
+
 @router.post("/")
 def create_job_route(
     request: JobCreateRequest,
@@ -41,7 +42,8 @@ def create_job_route(
             current_user["company_id"],
             request.title,
             request.description,
-            request.requirements
+            request.requirements,
+            request.priority_weights,
         )
 
         return {

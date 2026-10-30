@@ -106,10 +106,12 @@ def extract_candidate_experience(resume_text: str) -> list[str]:
 
     return experiences
 
+
 def get_job_requirements(job: dict) -> dict:
     """
     Use structured job requirements when available.
-    Fall back to extracting requirements from the job description.
+    Fall back to extracting categories from the job description
+    and submitted requirement statements.
     """
     structured = job.get("requirements") or {}
     description = job.get("description") or ""
@@ -117,28 +119,60 @@ def get_job_requirements(job: dict) -> dict:
     if not isinstance(structured, dict):
         structured = {}
 
-    skills = structured.get("skills") or extract_resume_skills(description)
+    raw_skills = structured.get("skills") or []
+
+    if isinstance(raw_skills, str):
+        raw_skills = [raw_skills]
+
+    if not isinstance(raw_skills, list):
+        raw_skills = []
+
+    # Include submitted requirement statements when identifying categories.
+    requirement_text = "\n".join(
+        str(item) for item in raw_skills if item
+    )
+    combined_text = f"{description}\n{requirement_text}"
+
+    # Extract soft skills from explicit structured values first.
     soft_skills = (
         structured.get("soft_skills")
-        or extract_soft_skill_requirements(description)
+        or extract_soft_skill_requirements(combined_text)
     )
-    experience_years = structured.get("experience_years")
-    education_text = structured.get("education") or description
-    certification_text = structured.get("certifications")
 
+    # Keep category-specific skills separate from other requirements.
+    category_markers = (
+        "bachelor", "master", "phd", "doctorate",
+        "degree", "certification", "certified",
+        "years of experience", "internship",
+        "project experience", "communication", "teamwork",
+        "problem solving", "critical thinking",
+        "leadership", "adaptability", "attention to detail",
+    )
+
+    skills = [
+        item for item in raw_skills
+        if not any(marker in str(item).lower()
+                   for marker in category_markers)
+    ]
+
+    if not skills:
+        skills = extract_resume_skills(combined_text)
+
+    # Education
+    education_text = structured.get("education")
     if isinstance(education_text, dict):
         education_requirement = {
-            "required": bool(
-                education_text.get("required", True)
-            ),
+            "required": bool(education_text.get("required", True)),
             "level": education_text.get("level"),
             "fields": education_text.get("fields") or [],
         }
     else:
         education_requirement = extract_education_requirement(
-            str(education_text)
+            str(education_text or requirement_text or description)
         )
 
+    # Certifications
+    certification_text = structured.get("certifications")
     if isinstance(certification_text, list):
         certification_requirement = {
             "required": bool(certification_text),
@@ -146,26 +180,31 @@ def get_job_requirements(job: dict) -> dict:
         }
     else:
         certification_requirement = extract_certification_requirement(
-            str(certification_text or description)
+            str(certification_text or requirement_text or description)
         )
 
+    # Experience
+    experience_years = structured.get("experience_years")
     if experience_years is not None:
         experience_requirement = {
             "required": True,
             "minimum_years": experience_years,
         }
     else:
-        experience_requirement = extract_experience_requirement(description)
+        experience_requirement = extract_experience_requirement(
+            combined_text
+        )
+
+    experience_types = extract_experience_requirements(description)
 
     return {
         "skills": skills,
         "soft_skills": soft_skills,
         "experience": experience_requirement,
-        "experience_types": extract_experience_requirements(description),
+        "experience_types": experience_types,
         "education": education_requirement,
         "certifications": certification_requirement,
     }
-
 
 def build_application_comparison(application: dict) -> dict:
     """
@@ -244,8 +283,12 @@ def build_application_comparison(application: dict) -> dict:
             "result": soft_skills_result,
         },
     }
+    priority_weights = job.get("priority_weights")
 
-    scoring = score_candidate(comparison)
+    scoring = score_candidate(
+        comparison,
+        priority_weights=priority_weights,
+    )
 
     return {
         "comparison": comparison,

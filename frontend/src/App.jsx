@@ -203,6 +203,7 @@ function App() {
         title: formData.title,
         description: formData.description,
         requirements,
+        priority_weights: formData.priority_weights,
       });
 
       const response = await apiRequest("/jobs/");

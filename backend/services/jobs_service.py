@@ -1,14 +1,22 @@
 from datetime import datetime, timezone
 from supabase import Client
 
-
 def create_job(
     supabase_admin: Client,
     company_id: str,
     title: str,
     description: str,
-    requirements: dict | None
+    requirements: dict | None,
+    priority_weights: dict | None = None,
 ):
+    default_priority_weights = {
+        "skills": 35,
+        "experience": 25,
+        "education": 15,
+        "certifications": 10,
+        "soft_skills": 15,
+    }
+
     response = (
         supabase_admin
         .table("jobs")
@@ -17,7 +25,12 @@ def create_job(
             "title": title,
             "description": description,
             "requirements": requirements,
-            "status": "draft"
+            "priority_weights": (
+                priority_weights
+                if priority_weights is not None
+                else default_priority_weights
+            ),
+            "status": "draft",
         })
         .execute()
     )

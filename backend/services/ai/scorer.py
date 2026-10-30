@@ -107,9 +107,10 @@ def score_experience(experience_result):
     """
     Score years of experience and relevant experience types.
 
-    Years and experience types each contribute 50% when
-    both are required. If only one is provided, score it
-    independently.
+    Only score dimensions that have actual requirements.
+    If no minimum years are specified, do not penalize the
+    candidate for years. If no experience types are specified,
+    do not score that dimension either.
     """
 
     years = experience_result.get("years", {})
@@ -117,17 +118,22 @@ def score_experience(experience_result):
 
     required_years = years.get("required")
     candidate_years = years.get("candidate")
+    years_matched = years.get("matched")
 
     years_score = None
 
+    # Score years only when a minimum is specified.
     if required_years is not None:
-        if required_years <= 0:
-            years_score = 100
-        elif candidate_years is not None :
-            years_score = min(
-                100,
-                (candidate_years / required_years) * 100
-            )
+        if candidate_years is not None:
+            if required_years <= 0:
+                years_score = 100
+            else:
+                years_score = min(
+                    100,
+                    (candidate_years / required_years) * 100
+                )
+        elif years_matched is False:
+            years_score = 0
 
     matches = types.get("matches", [])
     related = types.get("related", [])
@@ -138,14 +144,11 @@ def score_experience(experience_result):
     types_score = None
 
     if total_types > 0:
-        types_points = (
-            len(matches) + (len(related) * 0.5)
-        )
+        types_points = len(matches) + (len(related) * 0.5)
 
-        types_score = (
-            types_points / total_types
-        ) * 100
+        types_score = (types_points / total_types) * 100
 
+    # Average only dimensions that have actual requirements.
     available_scores = []
 
     if years_score is not None:
@@ -157,10 +160,8 @@ def score_experience(experience_result):
     if not available_scores:
         return None
 
-    return round(
-        sum(available_scores) / len(available_scores),
-        2
-    )
+    return round(sum(available_scores) / len(available_scores), 2)
+
 
 
 def score_education(education_result):
@@ -270,33 +271,14 @@ def score_soft_skills(soft_skill_result):
     return round(score, 2)
 
 
-def score_candidate(comparison):
+
+def score_candidate(comparison, priority_weights=None):
     """
     Calculate category scores and the overall candidate score.
 
-    Expected input:
-    {
-        "skills": {
-            "required": True,
-            "result": {...}
-        },
-        "experience": {
-            "required": True,
-            "result": {...}
-        },
-        "education": {
-            "required": True,
-            "result": {...}
-        },
-        "certifications": {
-            "required": False,
-            "result": {...}
-        },
-        "soft_skills": {
-            "required": True,
-            "result": {...}
-        }
-    }
+    priority_weights is the configuration saved for the relevant job.
+    Categories marked required=False are excluded, and the remaining
+    weights are normalized before calculating the overall score.
     """
 
     category_scorers = {
@@ -306,6 +288,10 @@ def score_candidate(comparison):
         "certifications": score_certifications,
         "soft_skills": score_soft_skills,
     }
+
+    # Use the job-specific weights when provided.
+    # Otherwise, preserve the existing default weights.
+    weights = priority_weights or WEIGHTS
 
     category_scores = {}
     applicable_weights = {}
@@ -320,14 +306,18 @@ def score_candidate(comparison):
             continue
 
         result = category_data.get("result", {})
-
         score = scorer(result)
 
         if score is None:
             continue
 
+        weight = weights.get(category, 0)
+
+        if weight <= 0:
+            continue
+
         category_scores[category] = score
-        applicable_weights[category] = WEIGHTS[category]
+        applicable_weights[category] = weight
 
     total_weight = sum(applicable_weights.values())
 
