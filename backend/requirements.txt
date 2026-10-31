@@ -75,3 +75,4 @@ websockets==15.0.1
 yarl==1.25.1
 google-genai
 python-multipart
+openai
